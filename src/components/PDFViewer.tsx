@@ -13,7 +13,7 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col">
-      {/* Header */}
+      {/* Sarlavha */}
       <header className="flex items-center justify-between px-4 py-3 border-b bg-card">
         <div className="flex items-center gap-4">
           <button
@@ -36,7 +36,7 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
             className="btn-secondary py-2 px-4"
           >
             <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Download</span>
+            <span className="hidden sm:inline">Yuklab olish</span>
           </button>
           <button
             onClick={onClose}
@@ -47,12 +47,12 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
         </div>
       </header>
 
-      {/* PDF Content */}
+      {/* PDF Kontent */}
       <div className="flex-1 bg-muted/50">
         <iframe
           src={`${book.pdfUrl}#toolbar=0&navpanes=0`}
           className="w-full h-full"
-          title={`Reading ${book.title}`}
+          title={`${book.title} kitobini o'qish`}
         />
       </div>
     </div>

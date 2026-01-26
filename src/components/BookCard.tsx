@@ -17,7 +17,7 @@ export const BookCard = ({ book, onClick, coverImage }: BookCardProps) => {
         {coverImage ? (
           <img
             src={coverImage}
-            alt={`Cover of ${book.title}`}
+            alt={`${book.title} muqovasi`}
             className="book-cover"
           />
         ) : (
@@ -39,7 +39,7 @@ export const BookCard = ({ book, onClick, coverImage }: BookCardProps) => {
           {book.author}
         </p>
         <p className="text-xs text-muted-foreground mt-2">
-          {book.pages} pages • {book.publishedYear}
+          {book.pages} sahifa • {book.publishedYear}-yil
         </p>
       </div>
     </article>

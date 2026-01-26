@@ -20,7 +20,7 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-        <DialogTitle className="sr-only">{book.title} Details</DialogTitle>
+        <DialogTitle className="sr-only">{book.title} tafsilotlari</DialogTitle>
         <button
           onClick={onClose}
           className="absolute right-4 top-4 z-10 p-2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-muted transition-colors"
@@ -29,12 +29,12 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
         </button>
 
         <div className="flex flex-col md:flex-row">
-          {/* Cover Image */}
+          {/* Muqova rasmi */}
           <div className="md:w-2/5 p-6 md:p-8 flex justify-center bg-muted/30">
             {coverImage ? (
               <img
                 src={coverImage}
-                alt={`Cover of ${book.title}`}
+                alt={`${book.title} muqovasi`}
                 className="w-48 md:w-full max-w-xs rounded-lg shadow-book"
               />
             ) : (
@@ -44,7 +44,7 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
             )}
           </div>
 
-          {/* Details */}
+          {/* Tafsilotlar */}
           <div className="md:w-3/5 p-6 md:p-8 flex flex-col">
             <span className="text-sm font-medium text-primary uppercase tracking-wider">
               {book.category}
@@ -53,22 +53,22 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
               {book.title}
             </h2>
             <p className="text-lg text-muted-foreground mt-1">
-              by {book.author}
+              Muallif: {book.author}
             </p>
 
             <div className="flex flex-wrap gap-4 mt-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
-                <span>{book.pages} pages</span>
+                <span>{book.pages} sahifa</span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>{book.publishedYear}</span>
+                <span>{book.publishedYear}-yil</span>
               </div>
             </div>
 
             <div className="mt-6 flex-1">
-              <h3 className="font-semibold mb-2">About this book</h3>
+              <h3 className="font-semibold mb-2">Kitob haqida</h3>
               <p className="text-muted-foreground leading-relaxed">
                 {book.description}
               </p>
@@ -80,14 +80,14 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
                 className="btn-primary flex-1"
               >
                 <BookOpen className="h-5 w-5" />
-                Read Online
+                Onlayn o'qish
               </button>
               <button
                 onClick={handleDownload}
                 className="btn-secondary flex-1"
               >
                 <Download className="h-5 w-5" />
-                Download PDF
+                PDF yuklab olish
               </button>
             </div>
           </div>

@@ -10,19 +10,19 @@ export const Header = () => {
               <BookOpen className="h-6 w-6" />
             </div>
             <span className="font-serif text-xl font-bold">
-              PageTurn
+              Kitobxon
             </span>
           </a>
           
           <nav className="hidden md:flex items-center gap-6">
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
-              Browse
+              Ko'rish
             </a>
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
-              Categories
+              Kategoriyalar
             </a>
             <a href="#" className="text-sm font-medium hover:text-primary transition-colors">
-              About
+              Biz haqimizda
             </a>
           </nav>
         </div>
