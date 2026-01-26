@@ -14,8 +14,8 @@ export const BookGrid = ({ books, onBookClick, coverImages }: BookGridProps) => 
         <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4">
           <span className="text-4xl">📚</span>
         </div>
-        <h3 className="font-serif text-xl font-semibold mb-2">No books found</h3>
-        <p className="text-muted-foreground">Try adjusting your search or filter criteria</p>
+        <h3 className="font-serif text-xl font-semibold mb-2">Kitoblar topilmadi</h3>
+        <p className="text-muted-foreground">Qidiruv yoki filtr mezonlarini o'zgartirib ko'ring</p>
       </div>
     );
   }

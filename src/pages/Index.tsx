@@ -8,7 +8,7 @@ import { BookDetail } from "@/components/BookDetail";
 import { PDFViewer } from "@/components/PDFViewer";
 import { Footer } from "@/components/Footer";
 
-// Import cover images
+// Muqova rasmlarini import qilish
 import cover1 from "@/assets/cover-1.jpg";
 import cover2 from "@/assets/cover-2.jpg";
 import cover3 from "@/assets/cover-3.jpg";
@@ -39,7 +39,7 @@ const coverImages: Record<string, string> = {
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<Category>("All");
+  const [selectedCategory, setSelectedCategory] = useState<Category>("Barchasi");
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [readingBook, setReadingBook] = useState<Book | null>(null);
@@ -50,7 +50,7 @@ const Index = () => {
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.author.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory =
-        selectedCategory === "All" || book.category === selectedCategory;
+        selectedCategory === "Barchasi" || book.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
   }, [searchQuery, selectedCategory]);
@@ -98,10 +98,10 @@ const Index = () => {
 
           <div className="mb-6 flex items-center justify-between">
             <h2 className="font-serif text-2xl font-semibold">
-              {selectedCategory === "All" ? "All Books" : selectedCategory}
+              {selectedCategory === "Barchasi" ? "Barcha Kitoblar" : selectedCategory}
             </h2>
             <span className="text-sm text-muted-foreground">
-              {filteredBooks.length} {filteredBooks.length === 1 ? "book" : "books"} found
+              {filteredBooks.length} ta kitob topildi
             </span>
           </div>
 
