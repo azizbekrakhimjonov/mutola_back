@@ -14,7 +14,17 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
   if (!book) return null;
 
   const handleDownload = () => {
-    window.open(book.pdfUrl, '_blank');
+    if (book.pdfUrl.startsWith('data:')) {
+      // Base64 PDF uchun
+      const link = document.createElement('a');
+      link.href = book.pdfUrl;
+      link.download = `${book.title}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      window.open(book.pdfUrl, '_blank');
+    }
   };
 
   return (
@@ -31,9 +41,9 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
         <div className="flex flex-col md:flex-row">
           {/* Muqova rasmi */}
           <div className="md:w-2/5 p-6 md:p-8 flex justify-center bg-muted/30">
-            {coverImage ? (
+            {coverImage || (book.coverUrl?.startsWith('data:') ? book.coverUrl : undefined) ? (
               <img
-                src={coverImage}
+                src={coverImage || (book.coverUrl?.startsWith('data:') ? book.coverUrl : '')}
                 alt={`${book.title} muqovasi`}
                 className="w-48 md:w-full max-w-xs rounded-lg shadow-book"
               />
@@ -75,20 +85,29 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
-              <button
-                onClick={() => onRead(book)}
-                className="btn-primary flex-1"
-              >
-                <BookOpen className="h-5 w-5" />
-                Onlayn o'qish
-              </button>
-              <button
-                onClick={handleDownload}
-                className="btn-secondary flex-1"
-              >
-                <Download className="h-5 w-5" />
-                PDF yuklab olish
-              </button>
+              {book.pdfUrl && (
+                <button
+                  onClick={() => onRead(book)}
+                  className="btn-primary flex-1"
+                >
+                  <BookOpen className="h-5 w-5" />
+                  Onlayn o'qish
+                </button>
+              )}
+              {book.pdfUrl && (
+                <button
+                  onClick={handleDownload}
+                  className="btn-secondary flex-1"
+                >
+                  <Download className="h-5 w-5" />
+                  PDF yuklab olish
+                </button>
+              )}
+              {!book.pdfUrl && (
+                <div className="w-full text-center py-4 text-muted-foreground">
+                  <p>Bu kitob uchun elektron versiya mavjud emas</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

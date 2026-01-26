@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { books, type Category, type Book } from "@/data/books";
+import { useState, useMemo, useEffect } from "react";
+import { type Category, type Book } from "@/data/books";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { CategoryFilter } from "@/components/CategoryFilter";
@@ -7,35 +7,7 @@ import { BookGrid } from "@/components/BookGrid";
 import { BookDetail } from "@/components/BookDetail";
 import { PDFViewer } from "@/components/PDFViewer";
 import { Footer } from "@/components/Footer";
-
-// Muqova rasmlarini import qilish
-import cover1 from "@/assets/cover-1.jpg";
-import cover2 from "@/assets/cover-2.jpg";
-import cover3 from "@/assets/cover-3.jpg";
-import cover4 from "@/assets/cover-4.jpg";
-import cover5 from "@/assets/cover-5.jpg";
-import cover6 from "@/assets/cover-6.jpg";
-import cover7 from "@/assets/cover-7.jpg";
-import cover8 from "@/assets/cover-8.jpg";
-import cover9 from "@/assets/cover-9.jpg";
-import cover10 from "@/assets/cover-10.jpg";
-import cover11 from "@/assets/cover-11.jpg";
-import cover12 from "@/assets/cover-12.jpg";
-
-const coverImages: Record<string, string> = {
-  "1": cover1,
-  "2": cover2,
-  "3": cover3,
-  "4": cover4,
-  "5": cover5,
-  "6": cover6,
-  "7": cover7,
-  "8": cover8,
-  "9": cover9,
-  "10": cover10,
-  "11": cover11,
-  "12": cover12,
-};
+import { getStoredBooks } from "@/lib/bookStorage";
 
 const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,9 +15,34 @@ const Index = () => {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [readingBook, setReadingBook] = useState<Book | null>(null);
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
+
+  // LocalStorage dan kitoblarni yuklash
+  useEffect(() => {
+    const loadBooks = () => {
+      const storedBooks = getStoredBooks();
+      setAllBooks(storedBooks);
+    };
+
+    loadBooks();
+
+    // LocalStorage o'zgarganda yangilash
+    const handleStorageChange = () => {
+      loadBooks();
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    // Custom event qo'shish - bir oynada o'zgarish bo'lganda boshqa oynalarni yangilash uchun
+    window.addEventListener("booksUpdated", handleStorageChange);
+
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("booksUpdated", handleStorageChange);
+    };
+  }, []);
 
   const filteredBooks = useMemo(() => {
-    return books.filter((book) => {
+    return allBooks.filter((book) => {
       const matchesSearch =
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.author.toLowerCase().includes(searchQuery.toLowerCase());
@@ -53,7 +50,7 @@ const Index = () => {
         selectedCategory === "Barchasi" || book.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, allBooks]);
 
   const handleBookClick = (book: Book) => {
     setSelectedBook(book);
@@ -108,7 +105,7 @@ const Index = () => {
           <BookGrid
             books={filteredBooks}
             onBookClick={handleBookClick}
-            coverImages={coverImages}
+            coverImages={{}}
           />
         </section>
       </main>
@@ -120,7 +117,7 @@ const Index = () => {
         isOpen={isDetailOpen}
         onClose={handleCloseDetail}
         onRead={handleReadBook}
-        coverImage={selectedBook ? coverImages[selectedBook.id] : undefined}
+        coverImage={selectedBook ? (selectedBook.coverUrl?.startsWith('data:') ? selectedBook.coverUrl : undefined) : undefined}
       />
     </div>
   );
