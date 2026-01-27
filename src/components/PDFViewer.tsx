@@ -3,7 +3,6 @@ import { X, Download, ArrowLeft, ZoomIn, ZoomOut, RotateCw, ChevronLeft, Chevron
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 // PDF.js worker'ni sozlash
 if (typeof window !== 'undefined') {
@@ -21,74 +20,82 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
   const [zoom, setZoom] = useState<number>(1);
   const [rotation, setRotation] = useState<number>(0);
   const [pdfData, setPdfData] = useState<string | Uint8Array>("");
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [useIframe, setUseIframe] = useState<boolean>(false);
 
-  useEffect(() => {
-    const loadPdf = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        setUseIframe(false);
-        
-        if (book.pdfUrl.startsWith('data:')) {
-          // Base64 PDF uchun
-          const base64Data = book.pdfUrl.split(',')[1];
-          const byteCharacters = atob(base64Data);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          setPdfData(byteArray);
-        } else if (book.pdfUrl.startsWith('http://') || book.pdfUrl.startsWith('https://')) {
-          // Oddiy URL uchun - to'g'ridan-to'g'ri ishlatish
-          // Agar CORS muammosi bo'lsa, iframe fallback ishlatiladi
-          setPdfData(book.pdfUrl);
-        } else {
-          // Boshqa formatlar
-          setPdfData(book.pdfUrl);
-        }
-      } catch (err) {
-        console.error('PDF yuklashda xatolik:', err);
-        setError('PDF yuklashda xatolik yuz berdi');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const isDataPdf = !!book.pdfUrl && String(book.pdfUrl).startsWith("data:");
 
-    loadPdf();
-  }, [book.pdfUrl]);
+  // Base64 PDF → Blob URL (iframe da barqaror ishlaydi)
+  useEffect(() => {
+    if (isDataPdf && book.pdfUrl) {
+      try {
+        const dataUrl = String(book.pdfUrl);
+        const base64 = dataUrl.split(",")[1];
+        if (!base64) {
+          setError("PDF ma'lumoti noto'g'ri");
+          setLoading(false);
+          return;
+        }
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const blob = new Blob([bytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        setBlobUrl(url);
+        setUseIframe(true);
+        setLoading(false);
+        setError("");
+        return () => URL.revokeObjectURL(url);
+      } catch (e) {
+        console.error("PDF Blob yaratishda xatolik:", e);
+        setBlobUrl(null);
+        setPdfData(book.pdfUrl);
+        setUseIframe(true);
+        setLoading(false);
+        setError("");
+      }
+      return;
+    }
+    if (book.pdfUrl && (String(book.pdfUrl).startsWith("http://") || String(book.pdfUrl).startsWith("https://"))) {
+      setPdfData(book.pdfUrl);
+      setUseIframe(false);
+      setLoading(false);
+      setError("");
+      return;
+    }
+    setLoading(false);
+    setError(book.pdfUrl ? "PDF yuklashda xatolik" : "PDF mavjud emas");
+  }, [book.pdfUrl, isDataPdf]);
 
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setPageNumber(1);
   };
 
-  const onDocumentLoadError = (error: Error) => {
-    console.error('PDF yuklashda xatolik:', error);
-    // Agar oddiy URL bo'lsa va CORS muammosi bo'lsa, iframe ishlatish
-    if (typeof pdfData === 'string' && (pdfData.startsWith('http://') || pdfData.startsWith('https://'))) {
+  const onDocumentLoadError = (err: Error) => {
+    console.error("PDF yuklashda xatolik:", err);
+    const url = book.pdfUrl;
+    if (typeof url === "string" && (url.startsWith("http://") || url.startsWith("https://"))) {
       setUseIframe(true);
       setError("");
-      setLoading(false);
     } else {
-      setError('PDF yuklashda xatolik yuz berdi');
-      setLoading(false);
+      setError("PDF yuklashda xatolik yuz berdi");
     }
+    setLoading(false);
   };
 
   const handleDownload = () => {
-    if (book.pdfUrl.startsWith('data:')) {
-      const link = document.createElement('a');
-      link.href = book.pdfUrl;
+    const url = blobUrl || book.pdfUrl;
+    if (!url) return;
+    if (String(book.pdfUrl).startsWith("data:") || blobUrl) {
+      const link = document.createElement("a");
+      link.href = url;
       link.download = `${book.title}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } else {
-      window.open(book.pdfUrl, '_blank');
+      window.open(url, "_blank");
     }
   };
 
@@ -229,8 +236,8 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
       </header>
 
       {/* PDF Kontent */}
-      <ScrollArea className="flex-1 bg-muted/50">
-        <div className="flex items-center justify-center p-4 min-h-full">
+      <div className="flex-1 flex flex-col min-h-0 bg-muted/50 overflow-auto">
+        <div className="flex-1 flex flex-col items-stretch justify-start p-4 min-h-0">
           {loading && (
             <div className="flex flex-col items-center justify-center h-full">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
@@ -238,7 +245,7 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
             </div>
           )}
 
-          {error && (
+          {error && !String(book.pdfUrl || "").startsWith("data:") && (
             <div className="flex flex-col items-center justify-center h-full">
               <p className="text-destructive mb-4">{error}</p>
               <Button onClick={() => window.location.reload()}>
@@ -247,23 +254,42 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
             </div>
           )}
 
-          {!loading && !error && pdfData && useIframe && typeof pdfData === 'string' && (
-            <div className="w-full h-full">
-              <iframe
-                src={`${pdfData}#toolbar=1&navpanes=1&scrollbar=1`}
-                className="w-full h-full border-0 rounded-lg shadow-lg bg-white"
-                style={{
-                  minHeight: '600px',
+          {!loading && !error && useIframe && (blobUrl || (typeof pdfData === "string" && pdfData)) && (
+            <div className="w-full flex-1 flex flex-col gap-3" style={{ minHeight: "75vh" }}>
+              <Button
+                variant="default"
+                size="sm"
+                className="self-start shrink-0"
+                onClick={() => {
+                  const u = blobUrl || (typeof pdfData === "string" ? (pdfData.startsWith("http") ? `${pdfData}#toolbar=1&navpanes=1` : pdfData) : "");
+                  u && window.open(u, "_blank", "noopener");
                 }}
-                title={`${book.title} kitobini o'qish`}
-              />
+              >
+                Yangi oynada ochish
+              </Button>
+              <div className="flex-1 w-full rounded-lg overflow-hidden border bg-white" style={{ height: "75vh", minHeight: 400 }}>
+                <embed
+                  src={
+                    blobUrl ||
+                    (typeof pdfData === "string" ? (pdfData.startsWith("http") ? `${pdfData}#toolbar=1&navpanes=1` : pdfData) : "")
+                  }
+                  type="application/pdf"
+                  className="w-full h-full"
+                  style={{ width: "100%", height: "100%", minHeight: 400 }}
+                  title={`${book.title} — PDF`}
+                />
+              </div>
             </div>
           )}
 
           {!loading && !error && pdfData && !useIframe && (
             <div className="flex flex-col items-center">
               <Document
-                file={pdfData}
+                file={
+                  typeof pdfData === "string" && (pdfData.startsWith("http://") || pdfData.startsWith("https://"))
+                    ? { url: pdfData }
+                    : pdfData
+                }
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={onDocumentLoadError}
                 loading={
@@ -285,7 +311,7 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
             </div>
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Mobile uchun kontrollari */}
       <div className="md:hidden flex items-center justify-center gap-2 p-2 border-t bg-card flex-wrap">

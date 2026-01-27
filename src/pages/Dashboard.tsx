@@ -50,26 +50,17 @@ const Dashboard = () => {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
 
-  // Kitoblarni yuklash
+  // Kitoblarni yuklash (IndexedDB — cheklovsiz)
+  const loadBooks = async () => {
+    const list = await getStoredBooks();
+    setBooks(list);
+  };
+
   useEffect(() => {
-    const loadBooks = () => {
-      const storedBooks = getStoredBooks();
-      setBooks(storedBooks);
-    };
-
     loadBooks();
-
-    const handleStorageChange = () => {
-      loadBooks();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    window.addEventListener("booksUpdated", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("booksUpdated", handleStorageChange);
-    };
+    const handleBooksUpdated = () => void loadBooks();
+    window.addEventListener("booksUpdated", handleBooksUpdated);
+    return () => window.removeEventListener("booksUpdated", handleBooksUpdated);
   }, []);
 
   const handleInputChange = (field: keyof Book, value: string | number) => {
@@ -179,12 +170,13 @@ const Dashboard = () => {
         publishedYear: formData.publishedYear || new Date().getFullYear(),
       };
 
-      // LocalStorage ga saqlash
-      addBookToStorage(newBook);
+      // IndexedDB ga saqlash (cheklov yo‘q)
+      await addBookToStorage(newBook);
+      await loadBooks();
 
       toast({
         title: "Muvaffaqiyatli!",
-        description: "Kitob qo'shildi va home page ga qo'shildi",
+        description: "Kitob qo'shildi va bosh sahifada ko'rinadi",
       });
 
       // Formani tozalash
@@ -203,9 +195,10 @@ const Dashboard = () => {
       if (pdfInputRef.current) pdfInputRef.current.value = "";
       setShowAddForm(false);
     } catch (error) {
+      const message = error instanceof Error ? error.message : "Kitob qo'shishda xatolik yuz berdi";
       toast({
         title: "Xatolik",
-        description: "Kitob qo'shishda xatolik yuz berdi",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -217,9 +210,10 @@ const Dashboard = () => {
     setDeleteBookId(bookId);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteBookId) {
-      removeBookFromStorage(deleteBookId);
+      await removeBookFromStorage(deleteBookId);
+      await loadBooks();
       toast({
         title: "Muvaffaqiyatli!",
         description: "Kitob o'chirildi",

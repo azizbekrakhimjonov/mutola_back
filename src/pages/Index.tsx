@@ -6,6 +6,7 @@ import { CategoryFilter } from "@/components/CategoryFilter";
 import { BookGrid } from "@/components/BookGrid";
 import { BookDetail } from "@/components/BookDetail";
 import { PDFViewer } from "@/components/PDFViewer";
+import { NewsSection } from "@/components/NewsSection";
 import { Footer } from "@/components/Footer";
 import { getStoredBooks } from "@/lib/bookStorage";
 
@@ -15,34 +16,22 @@ const Index = () => {
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [readingBook, setReadingBook] = useState<Book | null>(null);
-  const [allBooks, setAllBooks] = useState<Book[]>([]);
+  const [storedOnly, setStoredOnly] = useState<Book[]>([]);
 
-  // LocalStorage dan kitoblarni yuklash
+  // Faqat Dashboard orqali qo'shilgan kitoblar (IndexedDB — cheklovsiz)
   useEffect(() => {
-    const loadBooks = () => {
-      const storedBooks = getStoredBooks();
-      setAllBooks(storedBooks);
+    const loadBooks = async () => {
+      const list = await getStoredBooks();
+      setStoredOnly(list);
     };
-
     loadBooks();
-
-    // LocalStorage o'zgarganda yangilash
-    const handleStorageChange = () => {
-      loadBooks();
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    // Custom event qo'shish - bir oynada o'zgarish bo'lganda boshqa oynalarni yangilash uchun
-    window.addEventListener("booksUpdated", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-      window.removeEventListener("booksUpdated", handleStorageChange);
-    };
+    const handleBooksUpdated = () => void loadBooks();
+    window.addEventListener("booksUpdated", handleBooksUpdated);
+    return () => window.removeEventListener("booksUpdated", handleBooksUpdated);
   }, []);
 
   const filteredBooks = useMemo(() => {
-    return allBooks.filter((book) => {
+    return storedOnly.filter((book) => {
       const matchesSearch =
         book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         book.author.toLowerCase().includes(searchQuery.toLowerCase());
@@ -50,7 +39,7 @@ const Index = () => {
         selectedCategory === "Barchasi" || book.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory, allBooks]);
+  }, [searchQuery, selectedCategory, storedOnly]);
 
   const handleBookClick = (book: Book) => {
     setSelectedBook(book);
@@ -108,6 +97,8 @@ const Index = () => {
             coverImages={{}}
           />
         </section>
+
+        <NewsSection />
       </main>
 
       <Footer />
