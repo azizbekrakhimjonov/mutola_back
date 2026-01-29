@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Document, Page, pdfjs } from "react-pdf";
 
-// PDF.js worker'ni sozlash
-if (typeof window !== 'undefined') {
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// PDF.js worker — lokal fayl (Vite build uchun)
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+if (typeof window !== "undefined") {
+  pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 }
 
 interface PDFViewerProps {
@@ -56,9 +57,11 @@ export const PDFViewer = ({ book, onClose }: PDFViewerProps) => {
       }
       return;
     }
-    if (book.pdfUrl && (String(book.pdfUrl).startsWith("http://") || String(book.pdfUrl).startsWith("https://"))) {
+    // Serverdan kelgan PDF — http/https yoki relative (/media/...) — iframe orqali (hozirgi domen)
+    const url = String(book.pdfUrl || "");
+    if (url && (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/"))) {
       setPdfData(book.pdfUrl);
-      setUseIframe(false);
+      setUseIframe(true);
       setLoading(false);
       setError("");
       return;

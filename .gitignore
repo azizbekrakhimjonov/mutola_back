@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+venv
+venv/*
+backend/venv
+backend/venv/*
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -23,6 +27,13 @@ dist-ssr
 *.sln
 *.sw?
 
-# Backend DB (serverda hosil bo‘ladi)
-server/mutola.sqlite
-server/*.sqlite
+# Django backend
+backend/venv
+backend/__pycache__
+backend/**/__pycache__
+backend/*.sqlite3
+backend/db.sqlite3
+backend/media
+backend/staticfiles
+*.pyc
+.env

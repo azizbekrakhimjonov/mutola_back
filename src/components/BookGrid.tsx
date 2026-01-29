@@ -31,7 +31,7 @@ export const BookGrid = ({ books, onBookClick, coverImages }: BookGridProps) => 
           <BookCard 
             book={book} 
             onClick={() => onBookClick(book)}
-            coverImage={coverImages[book.id] || (book.coverUrl?.startsWith('data:') ? book.coverUrl : undefined)}
+            coverImage={coverImages[book.id] || book.coverUrl || undefined}
           />
         </div>
       ))}

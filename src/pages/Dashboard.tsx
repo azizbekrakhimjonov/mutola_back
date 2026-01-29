@@ -26,7 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { addBookToStorage, fileToBase64, getStoredBooks, removeBookFromStorage } from "@/lib/bookStorage";
+import { addBookToStorage, getStoredBooks, removeBookFromStorage } from "@/lib/bookStorage";
 import { Upload, X, FileText, Image as ImageIcon, Trash2, Plus } from "lucide-react";
 
 const Dashboard = () => {
@@ -50,10 +50,13 @@ const Dashboard = () => {
   const coverInputRef = useRef<HTMLInputElement>(null);
   const pdfInputRef = useRef<HTMLInputElement>(null);
 
-  // Kitoblarni yuklash (IndexedDB — cheklovsiz)
   const loadBooks = async () => {
-    const list = await getStoredBooks();
-    setBooks(list);
+    try {
+      const list = await getStoredBooks();
+      setBooks(list);
+    } catch {
+      setBooks([]);
+    }
   };
 
   useEffect(() => {
@@ -153,25 +156,16 @@ const Dashboard = () => {
         return;
       }
 
-      // Fayllarni base64 ga o'tkazish
-      const coverBase64 = await fileToBase64(coverFile);
-      const pdfBase64 = await fileToBase64(pdfFile);
-
-      // Yangi kitob yaratish
-      const newBook: Book = {
-        id: Date.now().toString(),
+      await addBookToStorage({
         title: formData.title!,
         author: formData.author!,
         description: formData.description!,
         category: formData.category || "Badiiy",
-        coverUrl: coverBase64,
-        pdfUrl: pdfBase64,
         pages: formData.pages || 0,
         publishedYear: formData.publishedYear || new Date().getFullYear(),
-      };
-
-      // IndexedDB ga saqlash (cheklov yo‘q)
-      await addBookToStorage(newBook);
+        coverFile,
+        pdfFile,
+      });
       await loadBooks();
 
       toast({
@@ -277,7 +271,7 @@ const Dashboard = () => {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      {book.coverUrl?.startsWith('data:') && (
+                      {book.coverUrl && (
                         <img
                           src={book.coverUrl}
                           alt={book.title}

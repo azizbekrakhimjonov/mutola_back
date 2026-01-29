@@ -18,11 +18,15 @@ const Index = () => {
   const [readingBook, setReadingBook] = useState<Book | null>(null);
   const [storedOnly, setStoredOnly] = useState<Book[]>([]);
 
-  // Faqat Dashboard orqali qo'shilgan kitoblar (IndexedDB — cheklovsiz)
+  // Serverdan (Django API) barcha kitoblar — Dashboard da qo'shilganlar ham shu yerda
   useEffect(() => {
     const loadBooks = async () => {
-      const list = await getStoredBooks();
-      setStoredOnly(list);
+      try {
+        const list = await getStoredBooks();
+        setStoredOnly(list);
+      } catch {
+        setStoredOnly([]);
+      }
     };
     loadBooks();
     const handleBooksUpdated = () => void loadBooks();
@@ -108,7 +112,7 @@ const Index = () => {
         isOpen={isDetailOpen}
         onClose={handleCloseDetail}
         onRead={handleReadBook}
-        coverImage={selectedBook ? (selectedBook.coverUrl?.startsWith('data:') ? selectedBook.coverUrl : undefined) : undefined}
+        coverImage={selectedBook?.coverUrl}
       />
     </div>
   );

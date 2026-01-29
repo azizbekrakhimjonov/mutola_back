@@ -14,16 +14,16 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
   if (!book) return null;
 
   const handleDownload = () => {
-    if (book.pdfUrl.startsWith('data:')) {
-      // Base64 PDF uchun
-      const link = document.createElement('a');
+    if (!book.pdfUrl) return;
+    if (book.pdfUrl.startsWith("data:")) {
+      const link = document.createElement("a");
       link.href = book.pdfUrl;
       link.download = `${book.title}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } else {
-      window.open(book.pdfUrl, '_blank');
+      window.open(book.pdfUrl, "_blank");
     }
   };
 
@@ -41,9 +41,9 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
         <div className="flex flex-col md:flex-row">
           {/* Muqova rasmi */}
           <div className="md:w-2/5 p-6 md:p-8 flex justify-center bg-muted/30">
-            {coverImage || (book.coverUrl?.startsWith('data:') ? book.coverUrl : undefined) ? (
+            {(coverImage || book.coverUrl) ? (
               <img
-                src={coverImage || (book.coverUrl?.startsWith('data:') ? book.coverUrl : '')}
+                src={coverImage || book.coverUrl || ""}
                 alt={`${book.title} muqovasi`}
                 className="w-48 md:w-full max-w-xs rounded-lg shadow-book"
               />
@@ -87,7 +87,7 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
             <div className="flex flex-col sm:flex-row gap-3 mt-8">
               {book.pdfUrl && (
                 <button
-                  onClick={() => onRead(book)}
+                  onClick={() => book.pdfUrl && window.open(book.pdfUrl, "_blank", "noopener")}
                   className="btn-primary flex-1"
                 >
                   <BookOpen className="h-5 w-5" />
