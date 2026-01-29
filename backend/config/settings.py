@@ -9,7 +9,7 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-mutola-uz-2026-very-secret-key")
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "mutola.uz,www.mutola.uz,127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "mutola.uz,www.mutola.uz,127.0.0.1,localhost").split(",") if h.strip()]
 
 CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "https://mutola.uz,https://www.mutola.uz").split(",")
 
