@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn service for Django project (mutola_back)
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/mk/mutola_back/backend
+Environment="PATH=/root/mk/mutola_back/backend/venv/bin"
+ExecStart=/root/mk/mutola_back/backend/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

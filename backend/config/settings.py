@@ -3,11 +3,16 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-in-production")
+# .env faylini backend papkasidan o'qiydi
+from dotenv import load_dotenv
+load_dotenv(BASE_DIR / ".env")
+SECRET_KEY = "django-insecure-mutola-uz-2026-very-secret-key"
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+ALLOWED_HOSTS = ['mutola.uz', 'www.mutola.uz']
 
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+CSRF_TRUSTED_ORIGINS = ['https://mutola.uz', 'https://www.mutola.uz']
+
+DEBUG = True
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -65,17 +70,21 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = "/var/www/mutola.uz/static/"
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = "/var/www/mutola.uz/media/"
+
+# Katta PDF/muqova yuklash uchun (20 MB+)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024   # 100 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024   # 100 MB
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS: frontend (Vite) va deploy dan so‘ng domen
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 if not DEBUG:
-    CORS_ALLOWED_ORIGINS = os.environ.get("CORS_ORIGINS", "http://localhost:8080").split(",")
+    CORS_ALLOWED_ORIGINS = ['https://mutola.uz', 'https://www.mutola.uz']
 
 # REST Framework
 REST_FRAMEWORK = {
