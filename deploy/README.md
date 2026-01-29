@@ -6,6 +6,9 @@ Sayt: **http://mutola.uz:7511**
 ## 1. Systemd service (Gunicorn)
 
 ```bash
+# static va media papkalari (Gunicorn yozishi uchun)
+mkdir -p /root/mk/mutola_back/static /root/mk/mutola_back/media
+
 sudo cp deploy/mutola.service /etc/systemd/system/mutola.service
 sudo systemctl daemon-reload
 sudo systemctl enable mutola
@@ -14,6 +17,16 @@ sudo systemctl status mutola
 ```
 
 Backend: `/root/mk/mutola_back/backend`, Gunicorn: `127.0.0.1:8000`.
+
+**Agar "Worker failed to boot" xatosi chiqsa**, to‘liq traceback ni ko‘ring:
+```bash
+sudo journalctl -u mutola -n 80 --no-pager
+```
+yoki
+```bash
+sudo journalctl -u mutola -f
+```
+Keyin `sudo systemctl restart mutola` qiling — xato odatda yuqorida (ImportError, ModuleNotFoundError, PermissionError) ko‘rinadi.
 
 ---
 

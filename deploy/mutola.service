@@ -6,6 +6,10 @@ After=network.target
 User=root
 WorkingDirectory=/root/mk/mutola_back/backend
 Environment="PATH=/root/mk/mutola_back/backend/venv/bin"
+Environment="DJANGO_SETTINGS_MODULE=config.settings"
+# Ixtiyoriy: STATIC_ROOT va MEDIA_ROOT (bo‘lmasa backend/staticfiles va backend/media ishlatiladi)
+Environment="STATIC_ROOT=/root/mk/mutola_back/static"
+Environment="MEDIA_ROOT=/root/mk/mutola_back/media"
 ExecStart=/root/mk/mutola_back/backend/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8000 config.wsgi:application
 Restart=always
 
