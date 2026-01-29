@@ -42,7 +42,7 @@ class BookListCreateView(APIView):
                 "description": raw.get("description") or "",
                 "category": raw.get("category") or "Badiiy",
                 "pages": pages,
-                "published_year": published_year,
+                "publishedYear": published_year,
             }
             serializer = BookSerializer(data=data, context={"request": request})
             if serializer.is_valid():

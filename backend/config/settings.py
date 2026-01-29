@@ -3,16 +3,17 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# .env faylini backend papkasidan o'qiydi
+# .env faylini backend papkasidan o'qiydi (mavjud bo'lmasa xato bermaydi)
 from dotenv import load_dotenv
 load_dotenv(BASE_DIR / ".env")
-SECRET_KEY = "django-insecure-mutola-uz-2026-very-secret-key"
 
-ALLOWED_HOSTS = ['mutola.uz', 'www.mutola.uz']
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "django-insecure-mutola-uz-2026-very-secret-key")
 
-CSRF_TRUSTED_ORIGINS = ['https://mutola.uz', 'https://www.mutola.uz']
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "mutola.uz,www.mutola.uz,127.0.0.1,localhost").split(",")
 
-DEBUG = True
+CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS", "https://mutola.uz,https://www.mutola.uz").split(",")
+
+DEBUG = os.environ.get("DJANGO_DEBUG", "1").strip().lower() in ("1", "true", "yes")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -70,10 +71,11 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
-STATIC_ROOT = "/var/www/mutola.uz/static/"
+# Production: STATIC_ROOT env yoki loyiha ichida (Gunicorn ishga tushganda yo'l mavjud bo'lishi kerak)
+STATIC_ROOT = os.environ.get("STATIC_ROOT", str(BASE_DIR / "staticfiles"))
 
 MEDIA_URL = "media/"
-MEDIA_ROOT = "/var/www/mutola.uz/media/"
+MEDIA_ROOT = os.environ.get("MEDIA_ROOT", str(BASE_DIR / "media"))
 
 # Katta PDF/muqova yuklash uchun (20 MB+)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024   # 100 MB
