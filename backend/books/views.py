@@ -26,30 +26,45 @@ class BookListCreateView(APIView):
 
     def post(self, request):
         try:
-            # Faqat oddiy maydonlar (faylsiz) — pickle/deepcopy xatosini oldini olish
-            raw = request.data
+            # Multipart: POST yoki request.data (form maydonlari)
+            post = request.POST if request.POST else request.data
             try:
-                pages = int(raw.get("pages") or 0)
+                pages = int(post.get("pages") or 0)
             except (TypeError, ValueError):
                 pages = 0
             try:
-                published_year = int(raw.get("published_year") or raw.get("publishedYear") or date.today().year)
+                published_year = int(post.get("published_year") or post.get("publishedYear") or date.today().year)
             except (TypeError, ValueError):
                 published_year = date.today().year
+            title = (post.get("title") or "").strip()
+            author = (post.get("author") or "").strip()
+            if not title or not author:
+                return Response(
+                    {"detail": "Kitob nomi va muallif to'ldirilishi shart."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            cover = request.FILES.get("cover")
+            pdf_file = request.FILES.get("pdf")
+            if not cover or not pdf_file:
+                return Response(
+                    {"detail": "Kitob muqovasi va PDF fayl yuklanishi shart."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
             data = {
-                "title": raw.get("title") or "",
-                "author": raw.get("author") or "",
-                "description": raw.get("description") or "",
-                "category": raw.get("category") or "Badiiy",
+                "title": title,
+                "author": author,
+                "description": (post.get("description") or "").strip(),
+                "category": (post.get("category") or "Badiiy").strip() or "Badiiy",
                 "pages": pages,
                 "published_year": published_year,
+                "publishedYear": published_year,
             }
+            if not data["category"]:
+                data["category"] = "Badiiy"
             serializer = BookSerializer(data=data, context={"request": request})
             if serializer.is_valid():
                 book = serializer.save()
-                # Fayllarni saqlagandan keyin biriktirish (file obyektlari copy/pickle qilinmaydi)
-                cover = request.FILES.get("cover")
-                pdf_file = request.FILES.get("pdf")
+                # Fayllarni biriktirish (allaqachon tekshirildi)
                 update_fields = []
                 if cover:
                     book.cover = cover
@@ -60,7 +75,14 @@ class BookListCreateView(APIView):
                 if update_fields:
                     book.save(update_fields=update_fields)
                 return Response(BookSerializer(book, context={"request": request}).data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            err_msg = "; ".join(
+                f"{k}: {v[0]}" if isinstance(v, list) else f"{k}: {v}"
+                for k, v in (serializer.errors or {}).items()
+            )
+            return Response(
+                {"detail": err_msg or "Validatsiya xatosi"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except Exception as e:
             logger.exception("Kitob qo'shishda xatolik")
             err_msg = str(e) if settings.DEBUG else "Kitob saqlanmadi. Server loglarini tekshiring."

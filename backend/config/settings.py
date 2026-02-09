@@ -3,14 +3,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# .env faylini backend papkasidan o'qiydi
-from dotenv import load_dotenv
-load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = "django-insecure-mutola-uz-2026-very-secret-key"
 
-ALLOWED_HOSTS = ['mutola.uz', 'www.mutola.uz']
+ALLOWED_HOSTS = ['mutola.uz', 'www.mutola.uz', 'localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://mutola.uz', 'https://www.mutola.uz']
+CSRF_TRUSTED_ORIGINS = ['https://mutola.uz', 'https://www.mutola.uz', 'http://localhost:5173', 'http://127.0.0.1:5173']
 
 DEBUG = True
 
@@ -24,6 +21,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "books",
+    "news",
 ]
 
 MIDDLEWARE = [

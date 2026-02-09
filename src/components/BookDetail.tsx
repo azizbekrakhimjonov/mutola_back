@@ -62,11 +62,11 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
             <h2 className="font-serif text-2xl md:text-3xl font-bold mt-2 text-balance">
               {book.title}
             </h2>
-            <p className="text-lg text-muted-foreground mt-1">
+            <p className="text-lg text-foreground/90 mt-1 font-medium">
               Muallif: {book.author}
             </p>
 
-            <div className="flex flex-wrap gap-4 mt-6 text-sm text-muted-foreground">
+            <div className="flex flex-wrap gap-4 mt-6 text-sm text-foreground/80">
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 <span>{book.pages} sahifa</span>
@@ -78,9 +78,9 @@ export const BookDetail = ({ book, isOpen, onClose, onRead, coverImage }: BookDe
             </div>
 
             <div className="mt-6 flex-1">
-              <h3 className="font-semibold mb-2">Kitob haqida</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {book.description}
+              <h3 className="font-semibold mb-2 text-foreground">Kitob haqida</h3>
+              <p className="text-foreground/85 leading-relaxed text-[15px]">
+                {book.description?.trim() || "Tavsif kiritilmagan."}
               </p>
             </div>
 

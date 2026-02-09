@@ -15,7 +15,7 @@ export const SearchBar = ({ value, onChange, placeholder = "Kitoblarni sarlavha 
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="search-input pl-12"
+        className="search-input pl-12 text-base md:text-lg py-3.5"
       />
     </div>
   );

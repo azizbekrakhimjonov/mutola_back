@@ -29,16 +29,16 @@ export const BookCard = ({ book, onClick, coverImage }: BookCardProps) => {
       </div>
       
       <div className="p-4">
-        <span className="text-xs font-medium text-primary uppercase tracking-wider">
+        <span className="text-xs font-sans font-bold text-primary uppercase tracking-wider">
           {book.category}
         </span>
-        <h3 className="font-serif text-lg font-semibold mt-1 line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="font-display text-lg font-bold mt-1 line-clamp-2 group-hover:text-primary transition-colors text-foreground">
           {book.title}
         </h3>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm font-sans font-medium text-foreground/90 mt-1">
           {book.author}
         </p>
-        <p className="text-xs text-muted-foreground mt-2">
+        <p className="text-xs font-sans text-foreground/75 mt-2">
           {book.pages} sahifa • {book.publishedYear}-yil
         </p>
       </div>

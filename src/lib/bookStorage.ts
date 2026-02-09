@@ -2,9 +2,9 @@ import { Book } from "@/data/books";
 
 const API_BASE = "";
 
-/** Barchaga ko‘rinadigan kitoblar — serverdan (Django API) */
+/** Barchaga ko‘rinadigan kitoblar — serverdan (Django API), cache yo‘q */
 export async function getStoredBooks(): Promise<Book[]> {
-  const r = await fetch(`${API_BASE}/api/books/`);
+  const r = await fetch(`${API_BASE}/api/books/`, { cache: "no-store" });
   if (!r.ok) {
     throw new Error("Kitoblarni yuklashda xatolik");
   }

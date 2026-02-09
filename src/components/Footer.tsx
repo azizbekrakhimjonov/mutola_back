@@ -10,13 +10,13 @@ export const Footer = () => {
             <span className="font-serif text-lg font-bold">Mutola.uz</span>
           </div>
           
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+          <div className="flex items-center gap-6 text-sm text-foreground/80">
             <a href="#" className="hover:text-foreground transition-colors">Maxfiylik</a>
             <a href="#" className="hover:text-foreground transition-colors">Shartlar</a>
             <a href="#" className="hover:text-foreground transition-colors">Bog'lanish</a>
           </div>
           
-          <p className="flex items-center gap-1 text-sm text-muted-foreground">
+          <p className="flex items-center gap-1 text-sm text-foreground/80">
             Kitob ixlosmandlari uchun <Heart className="h-4 w-4 text-primary fill-current" /> bilan yaratildi
           </p>
         </div>

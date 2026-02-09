@@ -21,7 +21,7 @@ export const BookGrid = ({ books, onBookClick, coverImages }: BookGridProps) => 
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
       {books.map((book, index) => (
         <div
           key={book.id}

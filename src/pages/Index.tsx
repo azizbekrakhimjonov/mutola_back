@@ -18,7 +18,7 @@ const Index = () => {
   const [readingBook, setReadingBook] = useState<Book | null>(null);
   const [storedOnly, setStoredOnly] = useState<Book[]>([]);
 
-  // Serverdan (Django API) barcha kitoblar — Dashboard da qo'shilganlar ham shu yerda
+  // Serverdan (Django API) barcha kitoblar — Dashboard va Admin dan qo‘shilganlar barchada
   useEffect(() => {
     const loadBooks = async () => {
       try {
@@ -31,7 +31,12 @@ const Index = () => {
     loadBooks();
     const handleBooksUpdated = () => void loadBooks();
     window.addEventListener("booksUpdated", handleBooksUpdated);
-    return () => window.removeEventListener("booksUpdated", handleBooksUpdated);
+    const onVisibilityChange = () => document.visibilityState === "visible" && loadBooks();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.removeEventListener("booksUpdated", handleBooksUpdated);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
   const filteredBooks = useMemo(() => {
@@ -78,8 +83,8 @@ const Index = () => {
           onSearchChange={setSearchQuery} 
         />
 
-        <section className="container mx-auto px-4 py-12">
-          <div className="mb-10">
+        <section className="container mx-auto px-4 py-6">
+          <div className="mb-6">
             <CategoryFilter
               selected={selectedCategory}
               onSelect={setSelectedCategory}
@@ -87,10 +92,10 @@ const Index = () => {
           </div>
 
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="font-serif text-2xl font-semibold">
+            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-foreground">
               {selectedCategory === "Barchasi" ? "Barcha Kitoblar" : selectedCategory}
             </h2>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-base text-foreground/80">
               {filteredBooks.length} ta kitob topildi
             </span>
           </div>
@@ -106,6 +111,24 @@ const Index = () => {
       </main>
 
       <Footer />
+
+      {/* QR kod — o'ng past, katta */}
+      <a
+        href="https://mutola.uz"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-30 flex flex-col items-center gap-1.5 p-3 bg-white rounded-xl shadow-lg border border-border/50 hover:shadow-xl transition-shadow"
+        title="Telefon orqali skanerlang"
+      >
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://mutola.uz"
+          alt="Mutola.uz QR kod"
+          width={140}
+          height={140}
+          className="rounded-lg"
+        />
+        <span className="text-sm font-medium text-foreground/80">mutola.uz</span>
+      </a>
 
       <BookDetail
         book={selectedBook}

@@ -23,6 +23,7 @@ export const Header = () => {
             <span className="font-serif text-xl font-bold">Mutola.uz</span>
           </Link>
 
+          <div className="flex items-center gap-4">
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/" className="text-sm font-medium hover:text-primary transition-colors">
               Ko&apos;rish
@@ -54,6 +55,7 @@ export const Header = () => {
               Yangiliklar
             </a>
           </nav>
+          </div>
         </div>
       </div>
     </header>

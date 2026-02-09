@@ -5,9 +5,10 @@ from .models import Book
 class BookSerializer(serializers.ModelSerializer):
     coverUrl = serializers.SerializerMethodField(read_only=True)
     pdfUrl = serializers.SerializerMethodField(read_only=True)
-    publishedYear = serializers.IntegerField(source="published_year")
-    cover = serializers.ImageField(required=False, write_only=True)
-    pdf_file = serializers.FileField(required=False, write_only=True)
+    publishedYear = serializers.IntegerField(source="published_year", required=False)
+    description = serializers.CharField(required=False, allow_blank=True)
+    cover = serializers.ImageField(required=False, write_only=True, allow_null=True)
+    pdf_file = serializers.FileField(required=False, write_only=True, allow_null=True)
 
     class Meta:
         model = Book
